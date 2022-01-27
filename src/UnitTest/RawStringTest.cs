@@ -596,6 +596,17 @@ namespace UnitTest
             Assert.True(rawStr3.GetHashCode() == RawString.GetHashCode(rawStr3.Ptr, rawStr3.Length));
         }
 
+        [Fact]
+        public unsafe void InvalidCharComparison()
+        {
+            var bytes = Encoding.UTF8.GetBytes("\ufffd");// "\ufffd" == "�" It is the default fallback character for UTF8Encoding
+            fixed(byte* ptr = bytes) {
+                var replacementCharStr = new RawString(ptr, bytes.Length);
+                Assert.False(replacementCharStr.StartsWith("\ud83d"));
+                Assert.False(replacementCharStr.EndsWith("\ud83d"));
+            }
+        }
+
         private readonly struct Check<T>
         {
             public readonly T Answer;
